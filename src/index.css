@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+/* ========================================
+   HOME / HERO BACKGROUND
+======================================== */
+
+.home-background {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* Background artwork */
+.home-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image: url("/hero-bg.png");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: min(62vw, 1050px) auto;
+}
+
+/* White readability fade */
+.home-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.98) 22%,
+      rgba(255, 255, 255, 0.82) 38%,
+      rgba(255, 255, 255, 0.25) 55%,
+      rgba(255, 255, 255, 0) 72%
+    );
+}
+
+/* ========================================
+   IMPORTANT LAYERING
+======================================== */
+
+/*
+  Navbar must always be above Hero.
+  Hero sits above the background image/overlay.
+*/
+
+.home-background > nav {
+  position: relative;
+  z-index: 50;
+}
+
+.home-background > section {
+  position: relative;
+  z-index: 10;
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes heroFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes heroText {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroImage {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-up {
+  animation: heroText 0.8s ease-out forwards;
+}
+
+.animate-fade-up-delay {
+  animation: heroText 0.8s ease-out 0.45s forwards;
+}
+
+.animate-fade-up-delay-2 {
+  animation: heroText 0.8s ease-out 0.7s forwards;
+}
+
+.animate-text-reveal {
+  animation:
+    heroText
+    0.8s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    0.15s
+    forwards;
+}
+
+.animate-text-reveal-delay {
+  animation:
+    heroText
+    0.8s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    0.3s
+    forwards;
+}
+
+.animate-text-reveal-delay-2 {
+  animation:
+    heroText
+    0.8s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    0.45s
+    forwards;
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 768px) {
+  .home-background {
+    min-height: 100vh;
+  }
+
+  .home-background::before {
+    background-position: 68% center;
+    background-size: auto 100%;
+  }
+
+  .home-background::after {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(255, 255, 255, 0.94) 35%,
+        rgba(255, 255, 255, 0.72) 65%,
+        rgba(255, 255, 255, 0.45) 100%
+      );
+  }
+}
