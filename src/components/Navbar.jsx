@@ -125,7 +125,7 @@ function Navbar() {
           sm:text-xl
         "
       >
-        NITHIN VIHASH
+        NITHIN VIHASH MOHAN
       </motion.a>
 
       {/* =========================
