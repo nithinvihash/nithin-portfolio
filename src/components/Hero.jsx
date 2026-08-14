@@ -11,7 +11,7 @@ function Hero() {
 
   /*
    * =========================================================
-   * MOUSE / PARALLAX SYSTEM
+   * MOUSE / PARALLAX
    * =========================================================
    */
 
@@ -19,120 +19,40 @@ function Hero() {
   const mouseY = useMotionValue(0)
 
   const smoothX = useSpring(mouseX, {
-    stiffness: 180,
-    damping: 22,
+    stiffness: 150,
+    damping: 24,
     mass: 0.35,
   })
 
   const smoothY = useSpring(mouseY, {
-    stiffness: 180,
-    damping: 22,
+    stiffness: 150,
+    damping: 24,
     mass: 0.35,
   })
 
-  /*
-   * NAME PARALLAX
-   */
+  const nameX = useTransform(smoothX, [-1, 1], [-10, 10])
+  const nameY = useTransform(smoothY, [-1, 1], [-7, 7])
 
   const nameRotateX = useTransform(
     smoothY,
     [-1, 1],
-    [7, -7],
+    [4, -4],
   )
 
   const nameRotateY = useTransform(
     smoothX,
     [-1, 1],
-    [-9, 9],
+    [-6, 6],
   )
 
-  const nameX = useTransform(
-    smoothX,
-    [-1, 1],
-    [-12, 12],
-  )
+  const panelX = useTransform(smoothX, [-1, 1], [18, -18])
+  const panelY = useTransform(smoothY, [-1, 1], [12, -12])
 
-  const nameY = useTransform(
-    smoothY,
-    [-1, 1],
-    [-8, 8],
-  )
+  const beamX = useTransform(smoothX, [-1, 1], [-25, 25])
+  const beamY = useTransform(smoothY, [-1, 1], [-18, 18])
 
-  /*
-   * BACKGROUND PARALLAX
-   */
-
-  const bgX = useTransform(
-    smoothX,
-    [-1, 1],
-    [-35, 35],
-  )
-
-  const bgY = useTransform(
-    smoothY,
-    [-1, 1],
-    [-25, 25],
-  )
-
-  /*
-   * GRID PARALLAX
-   */
-
-  const gridX = useTransform(
-    smoothX,
-    [-1, 1],
-    [-12, 12],
-  )
-
-  const gridY = useTransform(
-    smoothY,
-    [-1, 1],
-    [-8, 8],
-  )
-
-  /*
-   * RING PARALLAX
-   */
-
-  const ringX = useTransform(
-    smoothX,
-    [-1, 1],
-    [-18, 18],
-  )
-
-  const ringY = useTransform(
-    smoothY,
-    [-1, 1],
-    [-12, 12],
-  )
-
-  /*
-   * DNA PARALLAX
-   */
-
-  const dnaX = useTransform(
-    smoothX,
-    [-1, 1],
-    [20, -20],
-  )
-
-  const dnaY = useTransform(
-    smoothY,
-    [-1, 1],
-    [15, -15],
-  )
-
-  const dnaRotateX = useTransform(
-    smoothY,
-    [-1, 1],
-    [7, -7],
-  )
-
-  const dnaRotateY = useTransform(
-    smoothX,
-    [-1, 1],
-    [-10, 10],
-  )
+  const gridX = useTransform(smoothX, [-1, 1], [-8, 8])
+  const gridY = useTransform(smoothY, [-1, 1], [-6, 6])
 
   /*
    * =========================================================
@@ -164,11 +84,6 @@ function Hero() {
 
       setCursorVisible(true)
 
-      /*
-       * Normalize mouse position
-       * from -1 to 1
-       */
-
       const x =
         ((event.clientX - rect.left) / rect.width) * 2 - 1
 
@@ -178,37 +93,24 @@ function Hero() {
       mouseX.set(x)
       mouseY.set(y)
 
-      /*
-       * Less particles on mobile-sized screens
-       */
-
       const particleCount =
         window.innerWidth < 768 ? 1 : 2
 
-      const newParticles = Array.from(
+      const particles = Array.from(
         { length: particleCount },
         (_, index) => ({
           id: `${Date.now()}-${Math.random()}-${index}`,
-
           x: event.clientX,
-
           y: event.clientY,
-
-          size: Math.random() * 3 + 1,
-
-          driftX:
-            (Math.random() - 0.5) * 42,
-
-          driftY:
-            (Math.random() - 0.5) * 42,
-
-          rotation:
-            Math.random() * 180,
+          size: Math.random() * 2.5 + 1,
+          driftX: (Math.random() - 0.5) * 36,
+          driftY: (Math.random() - 0.5) * 36,
+          rotation: Math.random() * 180,
         }),
       )
 
       setDust((current) =>
-        [...current, ...newParticles].slice(-32),
+        [...current, ...particles].slice(-28),
       )
     }
 
@@ -240,15 +142,9 @@ function Hero() {
     }
   }, [mouseX, mouseY])
 
-  /*
-   * Remove old cursor particles
-   */
-
   useEffect(() => {
     const timer = setInterval(() => {
-      setDust((current) =>
-        current.slice(-24),
-      )
+      setDust((current) => current.slice(-20))
     }, 700)
 
     return () => clearInterval(timer)
@@ -256,31 +152,21 @@ function Hero() {
 
   /*
    * =========================================================
-   * FLOATING BACKGROUND PARTICLES
+   * BACKGROUND PARTICLES
    * =========================================================
    */
 
   const particles = useMemo(
     () =>
       Array.from(
-        { length: 26 },
+        { length: 22 },
         (_, index) => ({
           id: index,
-
-          left:
-            `${(index * 37) % 100}%`,
-
-          top:
-            `${(index * 61) % 100}%`,
-
-          size:
-            (index % 3) + 1,
-
-          duration:
-            6 + (index % 5),
-
-          delay:
-            (index % 6) * 0.8,
+          left: `${(index * 41) % 100}%`,
+          top: `${(index * 67) % 100}%`,
+          size: index % 3 === 0 ? 2 : 1,
+          duration: 7 + (index % 5),
+          delay: (index % 6) * 0.7,
         }),
       ),
     [],
@@ -302,65 +188,53 @@ function Hero() {
         overflow-hidden
         bg-[#050505]
         px-6
-        pb-16
-        pt-16
+        pb-12
+        pt-14
         text-white
         md:px-12
-        md:pb-20
-        md:pt-20
+        md:pb-16
+        md:pt-16
+        lg:px-16
       "
     >
 
       {/* =====================================================
-          DEEP ATMOSPHERE
+          ATMOSPHERE
       ====================================================== */}
 
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          overflow-hidden
-        "
-      >
+      <div className="
+        pointer-events-none
+        absolute
+        inset-0
+        overflow-hidden
+      ">
 
-        {/* Main atmosphere */}
-
-        <motion.div
+        <div
           className="
             absolute
-            left-1/2
-            top-[42%]
-            h-[650px]
-            w-[650px]
-            -translate-x-1/2
-            -translate-y-1/2
-            rounded-full
-            bg-lime-400/[0.055]
-            blur-[150px]
+            inset-0
+            bg-[radial-gradient(circle_at_70%_45%,rgba(170,255,0,0.055),transparent_32%),radial-gradient(circle_at_15%_80%,rgba(170,255,0,0.025),transparent_28%)]
           "
-          style={{
-            x: bgX,
-            y: bgY,
-          }}
         />
 
-        {/* Right atmosphere */}
-
         <motion.div
           className="
             absolute
-            right-[-10%]
-            top-[15%]
+            right-[8%]
+            top-[20%]
             h-[420px]
             w-[420px]
             rounded-full
-            bg-lime-300/[0.035]
+            bg-lime-400/[0.035]
             blur-[130px]
           "
+          style={{
+            x: panelX,
+            y: panelY,
+          }}
           animate={{
             scale: [1, 1.08, 1],
-            opacity: [0.45, 0.7, 0.45],
+            opacity: [0.35, 0.65, 0.35],
           }}
           transition={{
             duration: 8,
@@ -369,42 +243,19 @@ function Hero() {
           }}
         />
 
-        {/* Bottom atmosphere */}
-
-        <motion.div
-          className="
-            absolute
-            bottom-[-20%]
-            left-[10%]
-            h-[420px]
-            w-[420px]
-            rounded-full
-            bg-lime-400/[0.025]
-            blur-[140px]
-          "
-          animate={{
-            x: [-30, 30, -30],
-            y: [20, -20, 20],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
       </div>
 
 
       {/* =====================================================
-          MOVING GRID
+          TECHNICAL GRID
       ====================================================== */}
 
       <motion.div
         className="
           pointer-events-none
           absolute
-          inset-[-10%]
-          opacity-[0.045]
+          inset-[-8%]
+          opacity-[0.035]
         "
         style={{
           x: gridX,
@@ -415,79 +266,159 @@ function Hero() {
           className="
             absolute
             inset-0
-            bg-[linear-gradient(rgba(255,255,255,0.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.35)_1px,transparent_1px)]
-            bg-[size:60px_60px]
+            bg-[linear-gradient(rgba(255,255,255,0.4)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.4)_1px,transparent_1px)]
+            bg-[size:70px_70px]
           "
         />
       </motion.div>
 
 
-      {/* =====================================================
-          ORBITAL RINGS
+            {/* =====================================================
+          DIAGONAL SYSTEM BEAMS
       ====================================================== */}
 
-      <motion.div
-        className="
-          pointer-events-none
-          absolute
-          left-1/2
-          top-1/2
-          h-[520px]
-          w-[520px]
-          -translate-x-1/2
-          -translate-y-1/2
-          rounded-full
-          border
-          border-lime-300/[0.08]
-        "
-        style={{
-          x: ringX,
-          y: ringY,
-          rotateX: nameRotateX,
-          rotateY: nameRotateY,
-        }}
-        animate={{
-          rotate: 360,
-        }}
-        transition={{
-          duration: 35,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-      />
+      <div className="
+        pointer-events-none
+        absolute
+        inset-0
+        overflow-hidden
+      ">
 
-      <motion.div
-        className="
-          pointer-events-none
-          absolute
-          left-1/2
-          top-1/2
-          h-[390px]
-          w-[680px]
-          -translate-x-1/2
-          -translate-y-1/2
-          rounded-[50%]
-          border
-          border-lime-300/[0.055]
-        "
-        style={{
-          x: ringX,
-          y: ringY,
-          rotateZ: -18,
-        }}
-        animate={{
-          rotateZ: [-18, -10, -18],
-        }}
-        transition={{
-          duration: 9,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
+        {/* ORIGINAL DIAGONAL BEAMS */}
 
+        <motion.div
+          className="
+            absolute
+            left-[52%]
+            top-[-20%]
+            h-[150%]
+            w-px
+            origin-center
+            bg-lime-300/10
+          "
+          style={{
+            x: beamX,
+            y: beamY,
+            rotate: 38,
+          }}
+        />
+
+        <motion.div
+          className="
+            absolute
+            left-[66%]
+            top-[-20%]
+            h-[150%]
+            w-px
+            origin-center
+            bg-lime-300/[0.07]
+          "
+          style={{
+            x: beamX,
+            y: beamY,
+            rotate: 38,
+          }}
+        />
+
+        <motion.div
+          className="
+            absolute
+            left-[77%]
+            top-[-20%]
+            h-[150%]
+            w-px
+            origin-center
+            bg-white/[0.035]
+          "
+          style={{
+            x: beamX,
+            y: beamY,
+            rotate: 38,
+          }}
+        />
+
+        <motion.div
+          className="
+            absolute
+            left-[42%]
+            top-[50%]
+            h-px
+            w-[80%]
+            bg-lime-300/[0.07]
+          "
+          style={{
+            x: beamX,
+            y: beamY,
+            rotate: -13,
+          }}
+        />
+
+
+        {/* =================================================
+            LARGE X BEAM — REFERENCE STYLE
+        ================================================== */}
+
+        <motion.div
+          className="
+            absolute
+            left-[68%]
+            top-[48%]
+            h-[145%]
+            w-[2px]
+            origin-center
+            bg-lime-300/[0.10]
+            shadow-[0_0_18px_rgba(190,255,60,0.08)]
+          "
+          style={{
+            x: beamX,
+            y: beamY,
+            rotate: 45,
+          }}
+        />
+
+        <motion.div
+          className="
+            absolute
+            left-[68%]
+            top-[48%]
+            h-[145%]
+            w-[2px]
+            origin-center
+            bg-lime-300/[0.08]
+            shadow-[0_0_18px_rgba(190,255,60,0.06)]
+          "
+          style={{
+            x: beamX,
+            y: beamY,
+            rotate: -45,
+          }}
+        />
+
+        {/* SOFT GLOW AT X INTERSECTION */}
+
+        <motion.div
+          className="
+            absolute
+            left-[68%]
+            top-[48%]
+            h-32
+            w-32
+            -translate-x-1/2
+            -translate-y-1/2
+            rounded-full
+            bg-lime-300/[0.035]
+            blur-[45px]
+          "
+          style={{
+            x: beamX,
+            y: beamY,
+          }}
+        />
+
+      </div>
 
       {/* =====================================================
-          FLOATING BACKGROUND PARTICLES
+          BACKGROUND PARTICLES
       ====================================================== */}
 
       {particles.map((particle) => (
@@ -504,28 +435,12 @@ function Hero() {
             top: particle.top,
             width: particle.size,
             height: particle.size,
-
             boxShadow:
-              '0 0 10px rgba(190,255,60,0.7)',
+              '0 0 8px rgba(190,255,60,0.65)',
           }}
           animate={{
-            opacity: [
-              0.05,
-              0.35,
-              0.05,
-            ],
-
-            y: [
-              -8,
-              8,
-              -8,
-            ],
-
-            x: [
-              -4,
-              4,
-              -4,
-            ],
+            opacity: [0.03, 0.3, 0.03],
+            y: [-5, 5, -5],
           }}
           transition={{
             duration: particle.duration,
@@ -538,341 +453,6 @@ function Hero() {
 
 
       {/* =====================================================
-          DNA — PREMIUM DIAGONAL FLOATING OBJECT
-      ====================================================== */}
-
-      <motion.div
-        className="
-          pointer-events-none
-          absolute
-          right-[-105px]
-          top-[49%]
-          z-[4]
-          hidden
-          h-[650px]
-          w-[380px]
-          -translate-y-1/2
-          md:block
-          lg:right-[1%]
-          xl:right-[5%]
-        "
-        style={{
-          x: dnaX,
-          y: dnaY,
-
-          rotateX: dnaRotateX,
-          rotateY: dnaRotateY,
-
-          rotateZ: -22,
-
-          transformStyle: 'preserve-3d',
-
-          perspective: 1400,
-        }}
-        animate={{
-          y: [
-            0,
-            -14,
-            0,
-            14,
-            0,
-          ],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      >
-
-        {/* DNA atmospheric glow */}
-
-        <motion.div
-          className="
-            absolute
-            left-1/2
-            top-1/2
-            h-[500px]
-            w-[240px]
-            -translate-x-1/2
-            -translate-y-1/2
-            rounded-full
-            bg-lime-400/[0.055]
-            blur-[95px]
-          "
-          animate={{
-            scale: [
-              1,
-              1.12,
-              1,
-            ],
-
-            opacity: [
-              0.3,
-              0.6,
-              0.3,
-            ],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-
-        {/* =================================================
-            ACTUAL DNA
-        ================================================== */}
-
-        <motion.div
-          className="
-            absolute
-            left-1/2
-            top-1/2
-            h-[560px]
-            w-[230px]
-            -translate-x-1/2
-            -translate-y-1/2
-          "
-          animate={{
-            rotateY: [
-              0,
-              360,
-            ],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-          style={{
-            transformStyle:
-              'preserve-3d',
-          }}
-        >
-
-          <svg
-            viewBox="0 0 230 560"
-            className="
-              h-full
-              w-full
-              overflow-visible
-            "
-            fill="none"
-          >
-
-            {/* LEFT HELIX */}
-
-            <path
-              d="
-                M65 0
-                C150 45 150 95 65 140
-                C-20 185 -20 235 65 280
-                C150 325 150 375 65 420
-                C-20 465 -20 515 65 560
-              "
-              stroke="rgba(190,255,60,0.95)"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              filter="
-                drop-shadow(
-                  0 0 7px
-                  rgba(190,255,60,0.85)
-                )
-              "
-            />
-
-            {/* RIGHT HELIX */}
-
-            <path
-              d="
-                M165 0
-                C80 45 80 95 165 140
-                C250 185 250 235 165 280
-                C80 325 80 375 165 420
-                C250 465 250 515 165 560
-              "
-              stroke="rgba(255,255,255,0.7)"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              filter="
-                drop-shadow(
-                  0 0 6px
-                  rgba(255,255,255,0.35)
-                )
-              "
-            />
-
-            {/* =================================================
-                BASE PAIRS
-            ================================================== */}
-
-            {[...Array(14)].map(
-              (_, index) => {
-                const y =
-                  20 + index * 40
-
-                return (
-                  <motion.line
-                    key={index}
-                    x1="65"
-                    y1={y}
-                    x2="165"
-                    y2={y}
-                    stroke="rgba(190,255,60,0.35)"
-                    strokeWidth="1"
-                    strokeDasharray="3 5"
-                    animate={{
-                      opacity: [
-                        0.12,
-                        0.7,
-                        0.12,
-                      ],
-                    }}
-                    transition={{
-                      duration: 2.5,
-                      delay:
-                        index * 0.12,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                  />
-                )
-              },
-            )}
-
-            {/* =================================================
-                GLOW NODES
-            ================================================== */}
-
-            {[...Array(14)].map(
-              (_, index) => {
-                const y =
-                  20 + index * 40
-
-                return (
-                  <g
-                    key={`node-${index}`}
-                  >
-
-                    <circle
-                      cx="65"
-                      cy={y}
-                      r="3"
-                      fill="#d9ff75"
-                      filter="
-                        drop-shadow(
-                          0 0 7px
-                          rgba(190,255,60,1)
-                        )
-                      "
-                    />
-
-                    <circle
-                      cx="165"
-                      cy={y}
-                      r="2.5"
-                      fill="#ffffff"
-                      opacity="0.75"
-                      filter="
-                        drop-shadow(
-                          0 0 5px
-                          rgba(255,255,255,0.7)
-                        )
-                      "
-                    />
-
-                  </g>
-                )
-              },
-            )}
-
-          </svg>
-        </motion.div>
-
-
-        {/* =================================================
-            DNA PARTICLES
-        ================================================== */}
-
-        {[...Array(18)].map(
-          (_, index) => (
-            <motion.span
-              key={`dna-particle-${index}`}
-              className="
-                absolute
-                rounded-full
-                bg-lime-300
-              "
-              style={{
-                left:
-                  `${15 + ((index * 37) % 70)}%`,
-
-                top:
-                  `${5 + ((index * 53) % 90)}%`,
-
-                width:
-                  index % 3 === 0
-                    ? 3
-                    : 1.5,
-
-                height:
-                  index % 3 === 0
-                    ? 3
-                    : 1.5,
-
-                boxShadow:
-                  '0 0 8px rgba(190,255,60,0.9)',
-              }}
-              animate={{
-                x: [
-                  0,
-                  (index % 2 === 0
-                    ? 1
-                    : -1) *
-                    (8 +
-                      (index % 5) * 4),
-                  0,
-                ],
-
-                y: [
-                  0,
-                  -12 -
-                    (index % 4) * 4,
-                  0,
-                ],
-
-                opacity: [
-                  0.1,
-                  0.7,
-                  0.1,
-                ],
-
-                scale: [
-                  0.6,
-                  1.2,
-                  0.6,
-                ],
-              }}
-              transition={{
-                duration:
-                  3 + (index % 4),
-
-                delay:
-                  index * 0.15,
-
-                repeat: Infinity,
-
-                ease: 'easeInOut',
-              }}
-            />
-          ),
-        )}
-
-      </motion.div>
-
-
-      {/* =====================================================
           CURSOR CYBER DUST
       ====================================================== */}
 
@@ -881,7 +461,7 @@ function Hero() {
           pointer-events-none
           fixed
           inset-0
-          z-[60]
+          z-[70]
         "
       >
         {dust.map((particle) => (
@@ -897,39 +477,25 @@ function Hero() {
               top: particle.y,
               width: particle.size,
               height: particle.size,
-
               boxShadow:
-                '0 0 8px rgba(190,255,60,0.95), 0 0 18px rgba(170,255,0,0.55)',
+                '0 0 7px rgba(190,255,60,1), 0 0 16px rgba(170,255,0,0.5)',
             }}
             initial={{
               opacity: 0,
-              scale: 0.3,
+              scale: 0.2,
               x: 0,
               y: 0,
               rotate: 0,
             }}
             animate={{
-              opacity: [
-                0,
-                1,
-                0,
-              ],
-
-              scale: [
-                0.3,
-                1.4,
-                0,
-              ],
-
+              opacity: [0, 1, 0],
+              scale: [0.2, 1.3, 0],
               x: particle.driftX,
-
               y: particle.driftY,
-
-              rotate:
-                particle.rotation,
+              rotate: particle.rotation,
             }}
             transition={{
-              duration: 0.7,
+              duration: 0.65,
               ease: 'easeOut',
             }}
           />
@@ -938,37 +504,35 @@ function Hero() {
 
 
       {/* =====================================================
-          CURSOR RADIAL FIELD
+          CURSOR FIELD
       ====================================================== */}
 
       <motion.div
         className="
           pointer-events-none
           fixed
-          z-[40]
-          h-20
-          w-20
+          z-[60]
+          h-16
+          w-16
           -translate-x-1/2
           -translate-y-1/2
           rounded-full
           border
-          border-lime-300/20
-          bg-lime-300/[0.015]
-          blur-[1px]
+          border-lime-300/15
+          bg-lime-300/[0.01]
         "
         style={{
           left: '50%',
           top: '50%',
-          opacity:
-            cursorVisible ? 1 : 0,
+          opacity: cursorVisible ? 1 : 0,
         }}
         animate={{
           scale: cursorVisible
-            ? [0.8, 1, 0.9]
+            ? [0.85, 1, 0.9]
             : 0.8,
         }}
         transition={{
-          duration: 1.4,
+          duration: 1.3,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
@@ -976,38 +540,260 @@ function Hero() {
 
 
       {/* =====================================================
-          MAIN CONTENT
+          TOP SYSTEM BAR
       ====================================================== */}
 
-      <div
+      <motion.div
         className="
           relative
           z-10
+          mb-14
           flex
-          min-h-[calc(100vh-168px)]
           items-center
+          justify-between
+          border-b
+          border-zinc-800
+          pb-4
         "
+        initial={{
+          opacity: 0,
+          y: -15,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 0.7,
+        }}
       >
 
-        <div
-          className="
-            w-full
-            max-w-[1150px]
-          "
-        >
+        <div className="
+          flex
+          items-center
+          gap-3
+        ">
+          <span className="
+            h-2
+            w-2
+            rounded-full
+            bg-lime-400
+            shadow-[0_0_10px_rgba(190,255,60,0.8)]
+          " />
 
-          {/* =================================================
-              EYEBROW
-          ================================================= */}
+          <span className="
+            text-[9px]
+            font-bold
+            tracking-[0.25em]
+            text-zinc-500
+            sm:text-[10px]
+          ">
+            NITHIN / PORTFOLIO_SYSTEM
+          </span>
+        </div>
+
+        <div className="
+          hidden
+          items-center
+          gap-6
+          text-[9px]
+          font-bold
+          tracking-[0.2em]
+          text-zinc-700
+          sm:flex
+        ">
+          <span>2026 / 001</span>
+          <span>SYS.STATUS: NORMAL</span>
+        </div>
+
+      </motion.div>
+
+
+      {/* =====================================================
+          MAIN CONTENT
+      ====================================================== */}
+
+      <div className="
+        relative
+        z-10
+        mx-auto
+        grid
+        min-h-[calc(100vh-230px)]
+        max-w-[1450px]
+        items-center
+        gap-16
+        lg:grid-cols-[1.1fr_0.9fr]
+        lg:gap-8
+      ">
+
+
+        {/* =================================================
+            LEFT SIDE
+        ================================================== */}
+
+        <div className="relative">
 
           <motion.p
             className="
-              mb-8
+              mb-7
               text-[10px]
               font-bold
-              tracking-[0.25em]
+              tracking-[0.28em]
               text-zinc-500
               sm:text-xs
+            "
+            initial={{
+              opacity: 0,
+              x: -20,
+            }}
+            animate={{
+              opacity: 1,
+              x: 0,
+            }}
+            transition={{
+              duration: 0.7,
+              delay: 0.15,
+            }}
+          >
+            CSE (AI/ML) · PYTHON · WEB
+          </motion.p>
+
+
+          {/* NAME */}
+
+          <motion.div
+            style={{
+              perspective: 1200,
+            }}
+          >
+
+            <motion.h1
+              style={{
+                x: nameX,
+                y: nameY,
+                rotateX: nameRotateX,
+                rotateY: nameRotateY,
+                transformStyle: 'preserve-3d',
+              }}
+              className="
+                select-none
+                text-[clamp(4rem,10vw,9.5rem)]
+                font-black
+                leading-[0.78]
+                tracking-[-0.08em]
+              "
+              initial={{
+                opacity: 0,
+                y: 35,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 1,
+                delay: 0.25,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+
+              <span className="block">
+                NITHIN
+              </span>
+
+              <span className="
+                relative
+                block
+                text-lime-400
+              ">
+                VIHASH
+
+                <span
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    absolute
+                    left-[5px]
+                    top-[5px]
+                    -z-10
+                    text-zinc-800
+                    opacity-50
+                  "
+                >
+                  VIHASH
+                </span>
+              </span>
+
+              <span className="
+                mt-3
+                block
+                text-[clamp(1.5rem,3.2vw,3rem)]
+                font-bold
+                tracking-[-0.04em]
+                text-zinc-600
+              ">
+                MOHAN
+              </span>
+
+            </motion.h1>
+
+          </motion.div>
+
+
+          {/* DESCRIPTION */}
+
+          <motion.div
+            className="mt-10 max-w-xl"
+            initial={{
+              opacity: 0,
+              y: 25,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.8,
+              delay: 0.65,
+            }}
+          >
+
+            <p className="
+              text-lg
+              font-medium
+              leading-relaxed
+              text-zinc-300
+              md:text-xl
+            ">
+              Building digital systems
+              <br className="hidden sm:block" />
+              that move.
+            </p>
+
+            <p className="
+              mt-4
+              max-w-lg
+              text-sm
+              leading-relaxed
+              text-zinc-600
+              md:text-base
+            ">
+              Python, AI/ML experiments,
+              automation, and modern web
+              experiences.
+            </p>
+
+          </motion.div>
+
+
+          {/* BUTTONS */}
+
+          <motion.div
+            className="
+              mt-9
+              flex
+              flex-wrap
+              gap-3
             "
             initial={{
               opacity: 0,
@@ -1018,219 +804,18 @@ function Hero() {
               y: 0,
             }}
             transition={{
-              duration: 0.7,
-              delay: 0.15,
-              ease: [
-                0.22,
-                1,
-                0.36,
-                1,
-              ],
-            }}
-          >
-            CSE (AI/ML) · PYTHON DEVELOPER · WEB DEVELOPER
-          </motion.p>
-
-
-          {/* =================================================
-              NAME
-          ================================================= */}
-
-          <motion.div
-            style={{
-              perspective: 1200,
-            }}
-            className="relative"
-          >
-
-            {/* Atmospheric name shadow */}
-
-            <motion.div
-              aria-hidden="true"
-              className="
-                pointer-events-none
-                absolute
-                left-0
-                top-1/2
-                h-[180px]
-                w-[70%]
-                -translate-y-1/2
-                rounded-full
-                bg-lime-400/[0.045]
-                blur-[90px]
-              "
-              style={{
-                x: nameX,
-                y: nameY,
-              }}
-            />
-
-            {/* NAME */}
-
-            <motion.h1
-              style={{
-                rotateX: nameRotateX,
-                rotateY: nameRotateY,
-                x: nameX,
-                y: nameY,
-
-                transformStyle:
-                  'preserve-3d',
-              }}
-              className="
-                relative
-                select-none
-                text-[clamp(3.7rem,10vw,9rem)]
-                font-black
-                leading-[0.78]
-                tracking-[-0.075em]
-              "
-            >
-
-              <span className="block">
-                NITHIN
-              </span>
-
-              <span
-                className="
-                  relative
-                  block
-                  text-lime-400
-                "
-              >
-                VIHASH MOHAN
-
-                {/* Depth layer */}
-
-                <span
-                  aria-hidden="true"
-                  className="
-                    pointer-events-none
-                    absolute
-                    left-[4px]
-                    top-[4px]
-                    -z-10
-                    text-zinc-800
-                    opacity-60
-                  "
-                >
-                  VIHASH
-                </span>
-
-              </span>
-
-            </motion.h1>
-
-          </motion.div>
-
-
-          {/* =================================================
-              TAGLINE
-          ================================================= */}
-
-          <motion.div
-            className="
-              mt-10
-              max-w-xl
-            "
-            initial={{
-              opacity: 0,
-              y: 30,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.8,
-              delay: 0.65,
-              ease: [
-                0.22,
-                1,
-                0.36,
-                1,
-              ],
-            }}
-          >
-
-            <p
-              className="
-                text-lg
-                font-medium
-                leading-relaxed
-                text-zinc-400
-                md:text-xl
-              "
-            >
-              I build things, break things,
-              understand why they broke,
-              and build them better.
-            </p>
-
-            <p
-              className="
-                mt-4
-                text-sm
-                leading-relaxed
-                text-zinc-600
-                md:text-base
-              "
-            >
-              Python, AI/ML experiments, automation,
-              and modern web experiences.
-            </p>
-
-          </motion.div>
-
-
-          {/* =================================================
-              BUTTONS
-          ================================================= */}
-
-          <motion.div
-            className="
-              mt-10
-              flex
-              flex-wrap
-              gap-3
-              sm:mt-12
-              sm:gap-4
-            "
-            initial={{
-              opacity: 0,
-              y: 30,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
               duration: 0.8,
               delay: 0.8,
-              ease: [
-                0.22,
-                1,
-                0.36,
-                1,
-              ],
             }}
           >
-
-            {/* VIEW WORK */}
 
             <motion.a
               href="#work"
               whileHover={{
-                y: -5,
-                scale: 1.02,
+                y: -4,
               }}
               whileTap={{
                 scale: 0.97,
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 20,
               }}
               className="
                 group
@@ -1252,44 +837,31 @@ function Hero() {
               "
             >
               VIEW MY WORK
-
-              <span
-                className="
-                  ml-2
-                  inline-block
-                  transition-transform
-                  duration-300
-                  group-hover:translate-x-1
-                "
-              >
+              <span className="
+                ml-2
+                inline-block
+                transition-transform
+                duration-300
+                group-hover:translate-x-1
+              ">
                 →
               </span>
-
             </motion.a>
 
-
-            {/* RESUME */}
 
             <motion.a
               href="/resume.pdf"
               download
               whileHover={{
-                y: -5,
-                scale: 1.02,
+                y: -4,
               }}
               whileTap={{
                 scale: 0.97,
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 20,
               }}
               className="
                 group
                 border
                 border-zinc-700
-                bg-transparent
                 px-5
                 py-4
                 text-xs
@@ -1297,7 +869,6 @@ function Hero() {
                 tracking-[0.08em]
                 text-zinc-300
                 transition-all
-                duration-300
                 hover:border-lime-400
                 hover:text-lime-400
                 sm:px-6
@@ -1305,40 +876,27 @@ function Hero() {
               "
             >
               RESUME
-
-              <span
-                className="
-                  ml-2
-                  inline-block
-                  transition-transform
-                  duration-300
-                  group-hover:translate-y-1
-                "
-              >
+              <span className="
+                ml-2
+                inline-block
+                transition-transform
+                duration-300
+                group-hover:translate-y-1
+              ">
                 ↓
               </span>
-
             </motion.a>
 
-
-            {/* CONTACT */}
 
             <motion.a
               href="#contact"
               whileHover={{
-                y: -5,
-                scale: 1.02,
+                y: -4,
               }}
               whileTap={{
                 scale: 0.97,
               }}
-              transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 20,
-              }}
               className="
-                group
                 border
                 border-zinc-800
                 px-5
@@ -1348,32 +906,609 @@ function Hero() {
                 tracking-[0.08em]
                 text-zinc-500
                 transition-all
-                duration-300
                 hover:border-zinc-500
                 hover:text-white
                 sm:px-6
                 sm:text-sm
               "
             >
-              LET'S TALK
-
-              <span
-                className="
-                  ml-2
-                  inline-block
-                  transition-transform
-                  duration-300
-                  group-hover:translate-x-1
-                "
-              >
-                →
-              </span>
-
+              LET'S TALK →
             </motion.a>
 
           </motion.div>
 
         </div>
+
+
+        {/* =================================================
+            RIGHT SYSTEM HUD
+        ================================================== */}
+
+        <motion.div
+          className="
+            relative
+            mx-auto
+            w-full
+            max-w-[560px]
+          "
+          style={{
+            x: panelX,
+            y: panelY,
+          }}
+          initial={{
+            opacity: 0,
+            x: 50,
+          }}
+          animate={{
+            opacity: 1,
+            x: 0,
+          }}
+          transition={{
+            duration: 1,
+            delay: 0.45,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+
+          {/* Corner brackets */}
+
+          <div className="
+            absolute
+            -left-3
+            -top-3
+            h-7
+            w-7
+            border-l
+            border-t
+            border-lime-400/70
+          " />
+
+          <div className="
+            absolute
+            -right-3
+            -top-3
+            h-7
+            w-7
+            border-r
+            border-t
+            border-lime-400/70
+          " />
+
+          <div className="
+            absolute
+            -bottom-3
+            -left-3
+            h-7
+            w-7
+            border-b
+            border-l
+            border-lime-400/70
+          " />
+
+          <div className="
+            absolute
+            -bottom-3
+            -right-3
+            h-7
+            w-7
+            border-b
+            border-r
+            border-lime-400/70
+          " />
+
+
+          {/* Main panel */}
+
+          <div className="
+            relative
+            border
+            border-zinc-800
+            bg-[#080808]/90
+            backdrop-blur-sm
+          ">
+
+            {/* Header */}
+
+            <div className="
+              flex
+              items-center
+              justify-between
+              border-b
+              border-zinc-800
+              px-5
+              py-4
+            ">
+
+              <div className="
+                flex
+                items-center
+                gap-3
+              ">
+
+                <div className="
+                  flex
+                  gap-1
+                ">
+                  <span className="
+                    h-1.5
+                    w-1.5
+                    rounded-full
+                    bg-zinc-700
+                  "></span>
+                  <span className="
+                    h-1.5
+                    w-1.5
+                    rounded-full
+                    bg-zinc-700
+                  "></span>
+                  <span className="
+                    h-1.5
+                    w-1.5
+                    rounded-full
+                    bg-lime-400
+                  "></span>
+                </div>
+
+                <span className="
+                  text-[9px]
+                  font-bold
+                  tracking-[0.2em]
+                  text-zinc-500
+                ">
+                  IDENTITY_SYSTEM
+                </span>
+
+              </div>
+
+              <span className="
+                text-[9px]
+                font-bold
+                tracking-[0.2em]
+                text-lime-400
+              ">
+                ONLINE
+              </span>
+
+            </div>
+
+
+            {/* Main system area */}
+
+            <div className="
+              grid
+              min-h-[390px]
+              grid-cols-1
+              md:grid-cols-[1fr_0.8fr]
+            ">
+
+
+              {/* Left data */}
+
+              <div className="
+                border-b
+                border-zinc-800
+                p-6
+                md:border-b-0
+                md:border-r
+              ">
+
+                <p className="
+                  text-[9px]
+                  font-bold
+                  tracking-[0.22em]
+                  text-zinc-600
+                ">
+                  PROFILE / 001
+                </p>
+
+                <h2 className="
+                  mt-5
+                  text-3xl
+                  font-black
+                  tracking-[-0.05em]
+                  text-white
+                  sm:text-4xl
+                ">
+                  NITHIN
+                  <br />
+                  <span className="text-lime-400">
+                    VIHASH
+                  </span>
+                </h2>
+
+                <p className="
+                  mt-5
+                  max-w-xs
+                  text-xs
+                  leading-relaxed
+                  text-zinc-600
+                ">
+                  Computer Science student
+                  focused on AI/ML, Python
+                  development, automation,
+                  and modern web systems.
+                </p>
+
+
+                {/* System status */}
+
+                <div className="
+                  mt-8
+                  space-y-4
+                ">
+
+                  <div>
+                    <div className="
+                      mb-2
+                      flex
+                      justify-between
+                      text-[8px]
+                      font-bold
+                      tracking-[0.18em]
+                    ">
+                      <span className="text-zinc-600">
+                        SYSTEM_STATUS
+                      </span>
+
+                      <span className="text-lime-400">
+                        ACTIVE
+                      </span>
+                    </div>
+
+                    <div className="
+                      h-[2px]
+                      bg-zinc-800
+                    ">
+                      <motion.div
+                        className="
+                          h-full
+                          bg-lime-400
+                        "
+                        initial={{
+                          width: 0,
+                        }}
+                        animate={{
+                          width: '91%',
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          delay: 1,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+
+                  <div>
+                    <div className="
+                      mb-2
+                      flex
+                      justify-between
+                      text-[8px]
+                      font-bold
+                      tracking-[0.18em]
+                    ">
+                      <span className="text-zinc-600">
+                        BUILD_PROGRESS
+                      </span>
+
+                      <span className="text-zinc-400">
+                        82%
+                      </span>
+                    </div>
+
+                    <div className="
+                      h-[2px]
+                      bg-zinc-800
+                    ">
+                      <motion.div
+                        className="
+                          h-full
+                          bg-zinc-400
+                        "
+                        initial={{
+                          width: 0,
+                        }}
+                        animate={{
+                          width: '82%',
+                        }}
+                        transition={{
+                          duration: 1.4,
+                          delay: 1.1,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* Right technical stats */}
+
+              <div className="
+                p-6
+              ">
+
+                <p className="
+                  text-[9px]
+                  font-bold
+                  tracking-[0.22em]
+                  text-zinc-600
+                ">
+                  SYSTEM_DATA
+                </p>
+
+
+                <div className="
+                  mt-7
+                  space-y-6
+                ">
+
+                  <div>
+                    <p className="
+                      text-[8px]
+                      font-bold
+                      tracking-[0.18em]
+                      text-zinc-600
+                    ">
+                      CURRENT_BUILD
+                    </p>
+
+                    <p className="
+                      mt-2
+                      text-xl
+                      font-black
+                      tracking-[-0.04em]
+                      text-white
+                    ">
+                      NOVA
+                    </p>
+
+                    <p className="
+                      mt-1
+                      text-[9px]
+                      tracking-[0.15em]
+                      text-lime-400
+                    ">
+                      PERSONAL AI SYSTEM
+                    </p>
+                  </div>
+
+
+                  <div>
+                    <p className="
+                      text-[8px]
+                      font-bold
+                      tracking-[0.18em]
+                      text-zinc-600
+                    ">
+                      STACK
+                    </p>
+
+                    <div className="
+                      mt-3
+                      flex
+                      flex-wrap
+                      gap-2
+                    ">
+
+                      {[
+                        'PYTHON',
+                        'AI/ML',
+                        'REACT',
+                        'MYSQL',
+                      ].map((item) => (
+                        <span
+                          key={item}
+                          className="
+                            border
+                            border-zinc-800
+                            px-2
+                            py-1
+                            text-[8px]
+                            font-bold
+                            tracking-[0.12em]
+                            text-zinc-400
+                          "
+                        >
+                          {item}
+                        </span>
+                      ))}
+
+                    </div>
+                  </div>
+
+
+                  <div>
+                    <p className="
+                      text-[8px]
+                      font-bold
+                      tracking-[0.18em]
+                      text-zinc-600
+                    ">
+                      PROJECTS
+                    </p>
+
+                    <div className="
+                      mt-2
+                      flex
+                      items-end
+                      gap-2
+                    ">
+                      <span className="
+                        text-4xl
+                        font-black
+                        tracking-[-0.08em]
+                        text-white
+                      ">
+                        03
+                      </span>
+
+                      <span className="
+                        mb-1
+                        text-[8px]
+                        font-bold
+                        tracking-[0.15em]
+                        text-zinc-600
+                      ">
+                        ACTIVE_BUILDS
+                      </span>
+                    </div>
+                  </div>
+
+
+                  <div>
+                    <p className="
+                      text-[8px]
+                      font-bold
+                      tracking-[0.18em]
+                      text-zinc-600
+                    ">
+                      UPTIME
+                    </p>
+
+                    <p className="
+                      mt-2
+                      font-mono
+                      text-lg
+                      font-bold
+                      text-lime-400
+                    ">
+                      99.9%
+                    </p>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* Footer */}
+
+            <div className="
+              flex
+              items-center
+              justify-between
+              border-t
+              border-zinc-800
+              px-5
+              py-3
+            ">
+
+              <span className="
+                text-[8px]
+                font-bold
+                tracking-[0.18em]
+                text-zinc-700
+              ">
+                NITHIN_VIHASH // DEV
+              </span>
+
+              <span className="
+                text-[8px]
+                font-bold
+                tracking-[0.18em]
+                text-zinc-700
+              ">
+                SYS.STATUS: NORMAL
+              </span>
+
+            </div>
+
+          </div>
+
+
+          {/* Floating labels */}
+
+          <motion.div
+            className="
+              absolute
+              -right-3
+              top-[17%]
+              hidden
+              border
+              border-zinc-800
+              bg-[#050505]
+              px-3
+              py-2
+              lg:block
+            "
+            animate={{
+              y: [-4, 4, -4],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          >
+            <span className="
+              text-[8px]
+              font-bold
+              tracking-[0.15em]
+              text-zinc-600
+            ">
+              SYS.STATUS
+            </span>
+
+            <span className="
+              ml-2
+              text-[8px]
+              font-bold
+              text-lime-400
+            ">
+              NORMAL
+            </span>
+          </motion.div>
+
+
+          <motion.div
+            className="
+              absolute
+              -left-4
+              bottom-[15%]
+              hidden
+              border
+              border-zinc-800
+              bg-[#050505]
+              px-3
+              py-2
+              lg:block
+            "
+            animate={{
+              y: [4, -4, 4],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          >
+            <span className="
+              text-[8px]
+              font-bold
+              tracking-[0.15em]
+              text-zinc-600
+            ">
+              BUILD_MODE
+            </span>
+
+            <span className="
+              ml-2
+              text-[8px]
+              font-bold
+              text-white
+            ">
+              ACTIVE
+            </span>
+          </motion.div>
+
+        </motion.div>
+
       </div>
 
 
@@ -1385,61 +1520,48 @@ function Hero() {
         className="
           relative
           z-10
-          mt-8
+          mx-auto
+          mt-10
+          max-w-[1450px]
           border-t
           border-zinc-800
           pt-4
         "
         initial={{
           opacity: 0,
-          y: 20,
         }}
         animate={{
           opacity: 1,
-          y: 0,
         }}
         transition={{
-          duration: 0.7,
-          delay: 1,
-          ease: [
-            0.22,
-            1,
-            0.36,
-            1,
-          ],
+          duration: 0.8,
+          delay: 1.1,
         }}
       >
 
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-          "
-        >
+        <div className="
+          flex
+          items-center
+          justify-between
+        ">
 
-          <p
-            className="
-              text-[10px]
-              font-bold
-              tracking-[0.2em]
-              text-zinc-600
-              sm:text-xs
-            "
-          >
+          <p className="
+            text-[9px]
+            font-bold
+            tracking-[0.2em]
+            text-zinc-600
+            sm:text-[10px]
+          ">
             LEARN → BUILD → BREAK → IMPROVE
           </p>
 
-          <p
-            className="
-              hidden
-              text-xs
-              font-bold
-              tracking-[0.2em]
-              text-zinc-700
-              sm:block
-            "
-          >
+          <p className="
+            text-[9px]
+            font-bold
+            tracking-[0.2em]
+            text-zinc-700
+            sm:text-[10px]
+          ">
             SCROLL TO EXPLORE ↓
           </p>
 

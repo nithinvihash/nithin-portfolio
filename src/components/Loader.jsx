@@ -1,40 +1,45 @@
-import { motion, useMotionValue, animate } from 'framer-motion'
+
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 function Loader({ onComplete }) {
   const [progress, setProgress] = useState(0)
-  const progressValue = useMotionValue(0)
 
   useEffect(() => {
-    const controls = animate(progressValue, 100, {
-      duration: 2.4,
-      ease: [0.76, 0, 0.24, 1],
-      onUpdate: (latest) => {
-        setProgress(Math.floor(latest))
-      },
-      onComplete: () => {
+    let current = 0
+
+    const interval = setInterval(() => {
+      current += Math.floor(Math.random() * 4) + 2
+
+      if (current >= 100) {
+        current = 100
+        setProgress(100)
+
+        clearInterval(interval)
+
+        // Keep 100% visible briefly, then remove loader
         setTimeout(() => {
           onComplete?.()
-        }, 350)
-      },
-    })
+        }, 500)
 
-    return () => controls.stop()
-  }, [progressValue, onComplete])
+        return
+      }
 
-  const circumference = 2 * Math.PI * 150
+      setProgress(current)
+    }, 35)
+
+    return () => clearInterval(interval)
+  }, [onComplete])
+
+  const circumference = 2 * Math.PI * 145
   const dashOffset =
     circumference - (circumference * progress) / 100
 
   return (
     <motion.div
       className="
-        fixed
-        inset-0
-        z-[9999]
-        flex
-        items-center
-        justify-center
+        fixed inset-0 z-[9999]
+        flex items-center justify-center
         overflow-hidden
         bg-[#050505]
         text-white
@@ -42,322 +47,224 @@ function Loader({ onComplete }) {
       initial={{ opacity: 1 }}
       exit={{
         opacity: 0,
-        scale: 1.04,
-        filter: 'blur(10px)',
+        scale: 1.025,
+        filter: 'blur(8px)',
       }}
       transition={{
-        duration: 0.65,
+        duration: 0.6,
         ease: [0.76, 0, 0.24, 1],
       }}
     >
-      {/* =====================================================
-          BACKGROUND GRID
-      ====================================================== */}
+      {/* Background grid */}
 
       <div
         className="
           pointer-events-none
-          absolute
-          inset-0
-          opacity-[0.035]
-          bg-[linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)]
-          bg-[size:50px_50px]
+          absolute inset-0
+          opacity-[0.025]
+          [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)]
+          [background-size:70px_70px]
         "
       />
 
-      {/* =====================================================
-          CENTER ATMOSPHERIC GLOW
-      ====================================================== */}
+      {/* Ambient glow */}
 
       <motion.div
         className="
           pointer-events-none
           absolute
-          h-[350px]
-          w-[350px]
+          h-[280px] w-[280px]
           rounded-full
-          bg-lime-400/[0.055]
-          blur-[110px]
+          bg-lime-400/[0.045]
+          blur-[100px]
         "
         animate={{
-          scale: [0.85, 1.08, 0.85],
-          opacity: [0.35, 0.65, 0.35],
+          scale: [0.9, 1.08, 0.9],
+          opacity: [0.35, 0.55, 0.35],
         }}
         transition={{
-          duration: 3,
+          duration: 3.5,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
       />
 
-      {/* =====================================================
-          MAIN HUD
-      ====================================================== */}
+      {/* Loader */}
 
       <div
         className="
           relative
           flex
-          h-[330px]
-          w-[330px]
-          items-center
-          justify-center
-          sm:h-[390px]
-          sm:w-[390px]
+          h-[300px] w-[300px]
+          items-center justify-center
+          sm:h-[360px] sm:w-[360px]
         "
       >
-
-        {/* OUTER ROTATING RING */}
+        {/* Outer ring */}
 
         <motion.div
           className="
-            absolute
-            inset-0
+            absolute inset-0
             rounded-full
-            border
-            border-lime-400/10
+            border border-white/[0.06]
           "
-          animate={{
-            rotate: 360,
-          }}
+          animate={{ rotate: 360 }}
           transition={{
-            duration: 18,
+            duration: 20,
             repeat: Infinity,
             ease: 'linear',
           }}
         />
 
-        {/* OUTER DASHED RING */}
+        {/* Accent ring */}
 
         <motion.div
           className="
-            absolute
-            inset-[14px]
+            absolute inset-[13px]
             rounded-full
-            border
-            border-dashed
-            border-lime-400/20
+            border border-lime-400/[0.12]
           "
-          animate={{
-            rotate: -360,
-          }}
+          animate={{ rotate: -360 }}
           transition={{
-            duration: 12,
+            duration: 16,
             repeat: Infinity,
             ease: 'linear',
           }}
         />
 
-        {/* TECH MARKERS */}
-
-        <motion.div
-          className="
-            absolute
-            inset-[27px]
-            rounded-full
-            border
-            border-zinc-800
-          "
-          animate={{
-            rotate: 360,
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-        />
-
-        {/* =================================================
-            PROGRESS SVG
-        ================================================== */}
+        {/* Progress SVG */}
 
         <svg
           className="
             absolute
-            h-[300px]
-            w-[300px]
+            h-[270px] w-[270px]
             -rotate-90
-            sm:h-[360px]
-            sm:w-[360px]
+            sm:h-[330px] sm:w-[330px]
           "
-          viewBox="0 0 360 360"
+          viewBox="0 0 330 330"
         >
-          {/* Background circle */}
-
           <circle
-            cx="180"
-            cy="180"
-            r="150"
+            cx="165"
+            cy="165"
+            r="145"
             fill="none"
-            stroke="rgba(255,255,255,0.06)"
+            stroke="rgba(255,255,255,0.055)"
             strokeWidth="2"
           />
 
-          {/* Progress circle */}
-
           <motion.circle
-            cx="180"
-            cy="180"
-            r="150"
+            cx="165"
+            cy="165"
+            r="145"
             fill="none"
             stroke="#a3e635"
-            strokeWidth="3"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeDasharray={circumference}
-            style={{
+            animate={{
               strokeDashoffset: dashOffset,
+            }}
+            transition={{
+              duration: 0.08,
+              ease: 'linear',
+            }}
+            style={{
+              filter:
+                'drop-shadow(0 0 7px rgba(163,230,53,0.65))',
             }}
           />
 
-          {/* Inner subtle ring */}
-
           <circle
-            cx="180"
-            cy="180"
-            r="132"
+            cx="165"
+            cy="165"
+            r="126"
             fill="none"
-            stroke="rgba(163,230,53,0.08)"
+            stroke="rgba(163,230,53,0.055)"
             strokeWidth="1"
           />
         </svg>
 
-        {/* =================================================
-            CENTER CONTENT
-        ================================================== */}
+        {/* Center */}
 
         <div
           className="
-            relative
-            z-10
-            flex
-            flex-col
-            items-center
-            justify-center
+            relative z-10
+            flex flex-col
+            items-center justify-center
           "
         >
-          <motion.div
-            key={progress}
-            initial={{
-              opacity: 0.5,
-              scale: 0.97,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-            }}
-            transition={{
-              duration: 0.08,
-            }}
-            className="
-              text-[4.5rem]
-              font-black
-              leading-none
-              tracking-[-0.07em]
-              text-white
-              sm:text-[6rem]
-            "
-          >
-            {progress}
-            <span className="text-[2rem] text-lime-400 sm:text-[2.5rem]">
+          <div className="flex items-baseline leading-none">
+            <motion.span
+              key={progress}
+              initial={{ opacity: 0.6 }}
+              animate={{ opacity: 1 }}
+              className="
+                text-[4.5rem]
+                font-black
+                tracking-[-0.08em]
+                sm:text-[5.5rem]
+              "
+            >
+              {progress}
+            </motion.span>
+
+            <span
+              className="
+                ml-1
+                text-xl
+                font-bold
+                text-lime-400
+                sm:text-2xl
+              "
+            >
               %
             </span>
-          </motion.div>
+          </div>
 
-          <motion.p
-            className="
-              mt-5
-              text-[9px]
-              font-bold
-              tracking-[0.4em]
-              text-zinc-500
-            "
-            animate={{
-              opacity: [0.35, 1, 0.35],
-            }}
-            transition={{
-              duration: 1.2,
-              repeat: Infinity,
-            }}
-          >
-            INITIALIZING
-          </motion.p>
+          <div className="mt-4 flex items-center gap-2">
+            <motion.span
+              className="
+                h-1.5 w-1.5
+                rounded-full
+                bg-lime-400
+                shadow-[0_0_8px_rgba(163,230,53,0.8)]
+              "
+              animate={{
+                opacity: [0.35, 1, 0.35],
+              }}
+              transition={{
+                duration: 1.3,
+                repeat: Infinity,
+              }}
+            />
+
+            <span
+              className="
+                text-[9px]
+                font-bold
+                tracking-[0.35em]
+                text-zinc-500
+              "
+            >
+              {progress < 100 ? 'LOADING' : 'READY'}
+            </span>
+          </div>
         </div>
 
-        {/* =================================================
-            HUD LABELS
-        ================================================== */}
+        {/* Markers */}
 
-        <div
-          className="
-            absolute
-            left-0
-            top-1/2
-            -translate-x-3
-            -translate-y-1/2
-            text-[8px]
-            font-bold
-            tracking-[0.25em]
-            text-zinc-700
-          "
-        >
-          SYS
-        </div>
+        <span className="absolute left-[8px] top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-lime-400/70" />
 
-        <div
-          className="
-            absolute
-            right-0
-            top-1/2
-            translate-x-3
-            -translate-y-1/2
-            text-[8px]
-            font-bold
-            tracking-[0.25em]
-            text-zinc-700
-          "
-        >
-          01
-        </div>
+        <span className="absolute right-[8px] top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-lime-400/70" />
 
-        <div
-          className="
-            absolute
-            left-1/2
-            top-0
-            -translate-x-1/2
-            -translate-y-3
-            text-[8px]
-            font-bold
-            tracking-[0.25em]
-            text-zinc-700
-          "
-        >
-          NTHN
-        </div>
+        <span className="absolute left-1/2 top-[8px] h-1 w-1 -translate-x-1/2 rounded-full bg-lime-400/70" />
 
-        <div
-          className="
-            absolute
-            bottom-0
-            left-1/2
-            -translate-x-1/2
-            translate-y-3
-            text-[8px]
-            font-bold
-            tracking-[0.25em]
-            text-zinc-700
-          "
-        >
-          ONLINE
-        </div>
+        <span className="absolute bottom-[8px] left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-lime-400/70" />
       </div>
 
-      {/* =====================================================
-          BOTTOM STATUS
-      ====================================================== */}
+      {/* Identity */}
 
-      <motion.div
+      <div
         className="
           absolute
           bottom-8
@@ -369,59 +276,9 @@ function Loader({ onComplete }) {
           tracking-[0.35em]
           text-zinc-700
         "
-        animate={{
-          opacity: [0.3, 0.8, 0.3],
-        }}
-        transition={{
-          duration: 1.5,
-          repeat: Infinity,
-        }}
       >
-        NITHIN VIHASH // SYSTEM BOOT
-      </motion.div>
-
-      {/* =====================================================
-          SCANLINE
-      ====================================================== */}
-
-      <motion.div
-        className="
-          pointer-events-none
-          absolute
-          left-0
-          h-px
-          w-full
-          bg-lime-400/10
-        "
-        initial={{
-          top: '-5%',
-        }}
-        animate={{
-          top: '105%',
-        }}
-        transition={{
-          duration: 2.5,
-          ease: 'linear',
-        }}
-      />
-
-      {/* =====================================================
-          REDUCED MOTION
-      ====================================================== */}
-
-      <style>
-        {`
-          @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-              animation-duration: 0.01ms !important;
-              animation-iteration-count: 1 !important;
-              transition-duration: 0.01ms !important;
-            }
-          }
-        `}
-      </style>
+        NITHIN VIHASH
+      </div>
     </motion.div>
   )
 }
